@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"sync"
 	"sync/atomic"
@@ -100,7 +101,9 @@ func (s *Server) switchConfigs(config Configuration) {
 		cfg := routerCfg
 		var handler http.Handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(cfg.ResponseText))
+			if _, err := w.Write([]byte(cfg.ResponseText)); err != nil {
+				log.Printf("error writing response: %v", err)
+			}
 		})
 
 		// Wrap with middleware if configured, using the configuration snapshot
